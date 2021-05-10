@@ -34,7 +34,7 @@ def valida_filme(titulo, ano, classificacao, preco, diretores_id, generos_id):
         return False
     if len(preco) == 0:
         return False
-    if (diretores_id) == 0:
+    if diretores_id == 0:
         return False
     if str(generos_id) == 0:
         return False
@@ -49,3 +49,18 @@ def valida_locacao(data_inicio, data_fim, filmes_id, usuarios_id):
     if len(usuarios_id) == 0:
         return False
     return True
+
+
+def valida_pagamento(tipo, status, codigo_pagamento, valor, data, locacao_id):
+    if len(tipo) == 0:
+        return False
+    if len(status) == 0:
+        return False
+    if len(codigo_pagamento) == 0:
+        return False
+    if len(valor) == 0:
+        return False
+    if len(data) == 0:
+        return False
+    if locacao_id == 0:
+        return False
