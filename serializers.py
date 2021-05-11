@@ -9,6 +9,7 @@ def genero_from_web(**kwargs):
 
 def genero_from_db(nome):
     return {
+        "id": nome["id"],
         "nome": nome["nome"]
     }
 
@@ -48,7 +49,7 @@ def usuario_from_db(usuario):
 
 
 def nome_usuario_from_web(**kwargs):
-    return kwargs["nome_completo"] if "nome_completo" in kwargs else ""
+    return {kwargs["nome_completo"] if "nome_completo" in kwargs else ""}
 
 
 def filmes_from_web(**kwargs):
@@ -90,3 +91,30 @@ def locacoes_from_db(locacoes):
         "filmes_id": locacoes["filmes_id"],
         "usuarios_id": locacoes["usuarios_id"]
     }
+
+
+def pagamento_from_web(**kwargs):
+    return {
+        "tipo": kwargs["tipo"] if "tipo" in kwargs else "",
+        "status": kwargs["status"] if "status" in kwargs else "",
+        "codigo_pagamento": kwargs["codigo_pagamento"] if "codigo_pagamento" in kwargs else "",
+        "valor": kwargs["valor"] if "valor" in kwargs else "",
+        "data": kwargs["data"] if "data" in kwargs else "",
+        "locacoes_id": kwargs["locacoes_id"] if "locacoes_id" in kwargs else ""
+    }
+
+
+def pagamento_from_db(pagamento):
+    return {
+        "id": pagamento["id"],
+        "tipo": pagamento["tipo"],
+        "status": pagamento["status"],
+        "codigo_pagamento": pagamento["codigo_pagamento"],
+        "valor": pagamento["valor"],
+        "data": pagamento["data"],
+        "locacoes_id": pagamento["locacoes_id"]
+    }
+
+
+def id_pagamento_pagamento_from_web(**kwargs):
+    return {"id": kwargs["id"] if "id" in kwargs else ""}
