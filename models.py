@@ -75,7 +75,7 @@ def delete_filme(id_filme):
 
 
 def insert_locacao(data_inicio, data_fim, filmes_id, usuarios_id):
-    return insert("locacacoes",
+    return insert("locacoes",
                   ["data_inicio", "data_fim", "filmes_id", "usuarios_id"],
                   [data_inicio, data_fim, filmes_id, usuarios_id])
 
@@ -91,7 +91,7 @@ def update_locacao(id_locacao, data_inicio, data_fim, filmes_id, usuarios_id):
 
 
 def delete_locacao(id_locacao):
-    delete("locacacoes", "id", id_locacao)
+    delete("locacoes", "id", id_locacao)
 
 
 def insert_pagamento(tipo, status, codigo_pagamento, valor, data, locacoes_id):
@@ -109,5 +109,6 @@ def update_pagamento(id_pagamento, tipo, status, codigo_pagamento, valor, data, 
            ["tipo", "status", "codigo_pagamento", "valor", "data", "locacoes_id"],
            [tipo, status, codigo_pagamento, valor, data, locacoes_id])
 
+
 def delete_pagamento(id_pagamento):
-    delete("pagamento","id",id_pagamento)
+    delete("pagamento", "id", id_pagamento)

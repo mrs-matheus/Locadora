@@ -1,5 +1,7 @@
 from flask import Flask, jsonify, request
-from cmd_bd import select,select_like
+from cmd_bd import select, select_like, execute, query
+from datetime import datetime, timedelta
+from random import randint, random
 
 ##imports de usuarios:
 from serializers import usuario_from_web, usuario_from_db, nome_usuario_from_web
@@ -26,14 +28,10 @@ from serializers import locacoes_from_db, locacoes_from_web
 from models import insert_locacao, get_locacao, update_locacao, delete_locacao
 from validacao import valida_locacao
 
-
 # imports dos pagamentos
-from serializers import pagamento_from_db,pagamento_from_web
-from models import insert_pagamento,get_pagamento,update_pagamento,delete_pagamento
+from serializers import pagamento_from_db, pagamento_from_web
+from models import insert_pagamento, get_pagamento, update_pagamento, delete_pagamento
 from validacao import valida_pagamento
-
-
-
 
 app = Flask(__name__)
 
@@ -184,10 +182,12 @@ def deletar_filme(id):
 @app.route("/locacoes", methods=["POST"])
 def inserir_locacao():
     locacao = locacoes_from_web(**request.json)
-    if valida_locacao(**locacao):
-        id_locacao = insert_locacao(**locacao)
-        locacao_cadastrada = get_locacao(id_locacao)
+    if valida_pagamento(**locacao):
+        id_locacao = insert_locacao(locacao)
+        locacao_cadastrada = get_pagamento(id_locacao)
         return jsonify(locacoes_from_db(locacao_cadastrada))
+    else:
+        return jsonify({"erro": "locacao não cadastrado"})
 
 
 @app.route("/locacoes", methods=["GET"])
@@ -212,9 +212,10 @@ def deletar_locacao(id):
         delete_locacao(id)
         return "", 204
     except:
-        return jsonify("erro","Locação não deletada")
+        return jsonify("erro", "Locação não deletada")
 
-@app.route("/pagamento",methods=["POST"])
+
+@app.route("/pagamento", methods=["POST"])
 def inserir_pagamento():
     paga = pagamento_from_web(**request.json)
     if valida_pagamento(**paga):
@@ -222,21 +223,24 @@ def inserir_pagamento():
         pagamento_cadastrado = get_pagamento(id_pagamento)
         return jsonify(pagamento_from_db(pagamento_cadastrado))
     else:
-        return jsonify({"erro":"pagamento não cadastrado"})
+        return jsonify({"erro": "pagamento não cadastrado"})
 
-@app.route("/pagamento/<int:id>",methods=["GET"])
+
+@app.route("/pagamento/<int:id>", methods=["GET"])
 def buscar_pagamento(id):
-    return jsonify(select_like("pagamento","id",id))
+    return jsonify(select_like("pagamento", "id", id))
 
-@app.route("/pagamento/<int:id>",methods=["PUT.PATCH"])
+
+@app.route("/pagamento/<int:id>", methods=["PUT.PATCH"])
 def alterar_pagamento(id):
     pag = pagamento_from_web(**request.json)
     if valida_pagamento(**pag):
-        update_pagamento(id,**pag)
+        update_pagamento(id, **pag)
         pag_alterado = get_pagamento(id)
         return jsonify(pagamento_from_db(pag_alterado))
     else:
-        return jsonify({"erro":"Pagamento não foi atualizado"})
+        return jsonify({"erro": "Pagamento não foi atualizado"})
+
 
 @app.route("/pagamento/<int:id>")
 def deletar_pagamento(id):
@@ -244,7 +248,7 @@ def deletar_pagamento(id):
         delete_pagamento(id)
         return "", 204
     except:
-        return jsonify({"erro":"não foi possivel apagar o pagamento"})
+        return jsonify({"erro": "não foi possivel apagar o pagamento"})
 
 
 if __name__ == '__main__':
