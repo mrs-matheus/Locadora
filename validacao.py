@@ -4,8 +4,10 @@ from models import get_genero
 def valida_genero(nome):
     if len(nome) == 0:
         return False
+    return True
 
-   # genero = get_genero(nome)
-    #if genero:
-     #   return False
+
+def valida_diretores(nome_completo):
+    if len(nome_completo) == 0:
+        return False
     return True
