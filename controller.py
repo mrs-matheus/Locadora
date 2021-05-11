@@ -1,10 +1,30 @@
 from flask import Flask, jsonify, request
 from cmd_bd import select
-from serializers import diretores_from_db, usuario_from_web, usuario_from_db
-from serializers import genero_from_db, genero_from_web, diretores_from_web, nome_usuario_from_web
-from models import insert_diretor, update_diretor, delete_genero, update_usuario, delete_usuario,delete_diretor
-from models import get_genero, insert_genero, get_diretor, get_usuario, insert_usuario, select_usuarios
-from validacao import valida_genero, valida_diretores, valida_usuario
+
+##imports de usuarios:
+from serializers import usuario_from_web, usuario_from_db, nome_usuario_from_web
+from models import insert_usuario, get_usuario, update_usuario, delete_usuario, select_usuario
+from validacao import valida_usuario
+
+## imports dos generos:
+from serializers import genero_from_db, genero_from_web
+from models import insert_genero, get_genero, update_genero, delete_genero
+from validacao import valida_genero
+
+## imports dos diretores
+from serializers import diretores_from_db, diretores_from_web
+from models import insert_diretor, get_diretor, update_diretor, delete_diretor
+from validacao import valida_diretores
+
+## imports dos filmes
+from serializers import filmes_from_web, filmes_from_db
+from models import get_filme, insert_filme, update_filme, delete_filme
+from validacao import valida_filme
+
+## imports das locacoes
+from serializers import locacoes_from_db, locacoes_from_web
+from models import insert_locacao, get_locacao, update_locacao, delete_locacao
+from validacao import valida_locacao
 
 app = Flask(__name__)
 
@@ -26,7 +46,7 @@ def get_diretores():
 
 
 @app.route("/diretores/<int:id>", methods=["PUT", "PATCH"])
-def update_diretores():
+def update_diretores(id):
     diretor = diretores_from_web(**request.json)
     if valida_diretores(**diretor):
         update_diretor(id, **diretor)
@@ -59,14 +79,22 @@ def get_generos():
     return jsonify(select("generos"))
 
 
-@app.route("/generos", methods=["DELETE"])
-def delete_generos():
-    genero = genero_from_web(**request.json)
+@app.route("/generos/<int:id>", methods=["PUT", "PATCH"])
+def update_generos(id):
+    genero = diretores_from_web(**request.json)
     if valida_genero(**genero):
-        delete_genero(**genero)
-        return jsonify(select("generos"))
-    else:
-        return jsonify("erros", "genero invalido")
+        update_genero(id, **genero)
+        genero_alterado = get_genero(id)
+        return jsonify(diretores_from_db(genero_alterado))
+
+
+@app.route("/generos/<int:id>", methods=["DELETE"])
+def delete_generos(id):
+    try:
+        delete_genero(id)
+        return None, 204
+    except:
+        return jsonify({"erro": "Usuário possui itens conectados a ele"})
 
 
 @app.route("/usuarios", methods=["POST"])
@@ -78,6 +106,14 @@ def inserir_usuario():
         return jsonify(usuario_from_db(usuario_cadastrado))
     else:
         return jsonify({"erro": "Usuário inválido"})
+
+
+@app.route("/usuarios", methods=["GET"])
+def buscar_usuario():
+    nome_completo = nome_usuario_from_web(**request.args)
+    usuarios = select_usuario(nome_completo)
+    usuarios_from_db = [usuario_from_db(usuario) for usuario in usuarios]
+    return jsonify(usuarios_from_db)
 
 
 @app.route("/usuarios/<int:id>", methods=["PUT", "PATCH"])
@@ -100,12 +136,65 @@ def apagar_usuario(id):
         return jsonify({"erro": "Usuário possui itens conectados a ele"})
 
 
-@app.route("/usuarios", methods=["GET"])
-def buscar_usuario():
-    nome_completo = nome_usuario_from_web(**request.args)
-    usuarios = select_usuarios(nome_completo)
-    usuarios_from_db = [usuario_from_db(usuario) for usuario in usuarios]
-    return jsonify(usuarios_from_db)
+@app.route("/filmes", methods=["POST"])
+def inserir_filmes():
+    filmes = filmes_from_web(**request.json)
+    if valida_filme(**filmes):
+        id_filme = insert_filme(**filmes)
+        filme_criado = get_filme(id_filme)
+        return jsonify(filmes_from_db(filme_criado))
+    else:
+        return jsonify({"erro": "filme invalido"})
+
+
+@app.route("/filmes", methods=["GET"])
+def buscar_filmes():
+    return jsonify(select("filmes"))
+
+
+@app.route("/filmes/<int:id>", methods=["PUT", "PATCH"])
+def alterar_filmes(id):
+    filme = filmes_from_web(**request.json)
+    if valida_filme(**filme):
+        update_filme(id, **filme)
+        filme_alterado = get_filme(id)
+        return jsonify(filmes_from_db(filme_alterado))
+    else:
+        return jsonify({"erro": "filme nao foi alterado"})
+
+
+@app.route("/filmes/<int:id>", methods=["DELETE"])
+def deletar_filmes(id):
+    try:
+        delete_filme(id)
+        return None, 204
+    except:
+        return jsonify({"erro": "Filme não deletado"})
+
+
+@app.route("/locacoes", methods=["POST"])
+def inserir_locacoes():
+    locacao = locacoes_from_web(**request.json)
+    if valida_locacao(**locacao):
+        id_locacao = insert_locacao(**locacao)
+        locacao_cadastrada = get_locacao(id_locacao)
+        return jsonify(locacoes_from_db(locacao_cadastrada))
+
+
+@app.route("/locacoes", methods=["GET"])
+def buscar_locacao():
+    return jsonify(select("locacoes"))
+
+
+@app.route("/locacoes/<int:id>",methods=["PUT,DELETE"])
+def alterar_locacao(id):
+    locacao = locacoes_from_web(**request.json)
+    if valida_locacao(**locacao):
+        update_locacao(id,**locacao)
+        locacao_alterada = get_locacao(id)
+        return jsonify(locacoes_from_db(locacao_alterada))
+    else:
+        return jsonify({"erro":"Locação de filmes não foi alterada"})
 
 
 if __name__ == '__main__':
